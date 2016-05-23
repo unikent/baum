@@ -1,4 +1,8 @@
-# Baum
+# Baum <a href="https://travis-ci.org/gazsp/baum"><img src="https://travis-ci.org/gazsp/baum.svg?branch=master"></a> [![Coverage Status](https://coveralls.io/repos/gazsp/baum/badge.svg?branch=master&service=github)](https://coveralls.io/github/gazsp/baum?branch=master)
+
+## Forked from [etrepat/baum](https://github.com/etrepat/baum) - Continuing development and fixing failing unit tests on Laravel 5.x
+
+**If you find a bug, please file an issue and submit a pull request with a failing unit test**
 
 Baum is an implementation of the [Nested Set](http://en.wikipedia.org/wiki/Nested_set_model)
 pattern for [Laravel 5's](http://laravel.com/) Eloquent ORM.
@@ -96,7 +100,7 @@ ordinary trees are suddenly quite fast. Nifty, isn't it?
 Baum works with Laravel 5 onwards. You can add it to your `composer.json` file
 with:
 
-    "baum/baum": "~1.1"
+    "gazsp/baum": "~1.1"
 
 Run `composer install` to install it.
 
@@ -326,6 +330,7 @@ You can ask some questions to your Baum nodes:
 * `isRoot()`: Returns true if this is a root node.
 * `isLeaf()`: Returns true if this is a leaf node (end of a branch).
 * `isChild()`: Returns true if this is a child node.
+* `isChildOf($other)`: Returns true if this node is a child of the other.
 * `isDescendantOf($other)`: Returns true if node is a descendant of the other.
 * `isSelfOrDescendantOf($other)`: Returns true if node is self or a descendant.
 * `isAncestorOf($other)`: Returns true if node is an ancestor of the other.
@@ -593,24 +598,12 @@ Simple example usage, given a `Category` node class:
 Category::rebuild()
 ```
 
-Valid trees (per the `isValidNestedSet` method) will not get rebuilt. To force the index rebuilding process simply call the rebuild method with `true` as the first parameter:
-
-```php
-Category::rebuild(true);
-```
+No checks are made to see if the tree is already valid, meaning a call to rebuild will always rebuild the tree, whether it is valid or not. If you don't want this behaviour, don't call rebuild if isValidNestedSet returns true.
 
 <a name="soft-deletes"></a>
 ### Soft deletes
 
-Baum comes with **limited support** for soft-delete operations. What I mean
-by *limited* is that the testing is still limited and the *soft delete*
-functionality is changing in the upcoming 4.2 version of the framework, so use
-this feature wisely.
-
-For now, you may consider a **safe** `restore()` operation to be one of:
-
-* Restoring a leaf node
-* Restoring a whole sub-tree in which the parent is not soft-deleted
+Using soft deletes / `restore()` is not recommeded and may cause problems if a tree has been modified after a soft delete operation.
 
 <a name="seeding"></a>
 ### Seeding/Mass-assignment

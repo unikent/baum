@@ -1,3 +1,28 @@
+
+## 1.1.5
+_Mar 27 2015_
+
+* Fixed bug with Install command in Lumen [https://github.com/gazsp/baum/issues/12](https://github.com/gazsp/baum/issues/12)
+* Added getOthersAtSameDepth() method [https://github.com/gazsp/baum/commit/97dced5a6e40ed4437101aa2d53e0346cc1843f8](https://github.com/gazsp/baum/commit/97dced5a6e40ed4437101aa2d53e0346cc1843f8)
+
+## 1.1.4
+_Jan 5 2015_
+* Updated to use latest Laravel 5.2 packages
+* Now requires PHP >= v5.6.x
+
+## 1.1.3
+_Dec 27 2015_
+* API changes
+  - Removed 'force' parameter from `Node->rebuild`
+  - Removed unused 'excludeDeleted' parameter from `Node->newNestedSetQuery`
+* Bug fixes
+  - `Node::all` now uses columns parameter in get call
+* Documentation changes
+  - Soft delete now not advised
+
+## 1.1.2
+* ???
+
 ## 1.1.1
 _Mar 4 2015_
 * bug fixes

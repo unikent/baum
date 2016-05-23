@@ -42,10 +42,10 @@ class InstallCommand extends Command {
    * @return void
    */
   public function __construct(MigrationGenerator $migrator, ModelGenerator $modeler) {
-    parent::__construct();
+      parent::__construct();
 
-    $this->migrator = $migrator;
-    $this->modeler  = $modeler;
+      $this->migrator = $migrator;
+      $this->modeler  = $modeler;
   }
 
   /**
@@ -59,12 +59,9 @@ class InstallCommand extends Command {
    * @return void
    */
   public function fire() {
-    $name = $this->input->getArgument('name');
-
-    $this->writeMigration($name);
-
-    $this->writeModel($name);
-
+      $name = $this->input->getArgument('name');
+      $this->writeMigration($name);
+      $this->writeModel($name);
   }
 
   /**
@@ -73,9 +70,9 @@ class InstallCommand extends Command {
    * @return array
    */
   protected function getArguments() {
-    return array(
-      array('name', InputArgument::REQUIRED, 'Name to use for the scaffolding of the migration and model.')
-    );
+      return array(
+        array('name', InputArgument::REQUIRED, 'Name to use for the scaffolding of the migration and model.')
+      );
   }
 
   /**
@@ -85,9 +82,8 @@ class InstallCommand extends Command {
    * @return string
    */
   protected function writeMigration($name) {
-    $output = pathinfo($this->migrator->create($name, $this->getMigrationsPath()), PATHINFO_FILENAME);
-
-    $this->line("      <fg=green;options=bold>create</fg=green;options=bold>  $output");
+      $output = pathinfo($this->migrator->create($name, $this->getMigrationsPath()), PATHINFO_FILENAME);
+      $this->line("      <fg=green;options=bold>create</fg=green;options=bold>  $output");
   }
 
   /**
@@ -97,9 +93,8 @@ class InstallCommand extends Command {
    * @return string
    */
   protected function writeModel($name) {
-    $output = pathinfo($this->modeler->create($name, $this->getModelsPath()), PATHINFO_FILENAME);
-
-    $this->line("      <fg=green;options=bold>create</fg=green;options=bold>  $output");
+      $output = pathinfo($this->modeler->create($name, $this->getModelsPath()), PATHINFO_FILENAME);
+      $this->line("      <fg=green;options=bold>create</fg=green;options=bold>  $output");
   }
 
   /**
@@ -108,7 +103,7 @@ class InstallCommand extends Command {
    * @return string
    */
   protected function getMigrationsPath() {
-    return $this->laravel['path.database'].'/migrations';
+      return $this->laravel->databasePath();
   }
 
   /**
@@ -117,8 +112,7 @@ class InstallCommand extends Command {
    * @return string
    */
   protected function getModelsPath() {
-
-    return $this->laravel['path.base'];
+      return $this->laravel->basePath();
   }
 
 }

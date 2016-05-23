@@ -1,528 +1,565 @@
 <?php
 
-class CategoryMovementTest extends CategoryTestCase {
+class CategoryMovementTest extends CategoryTestCase
+{
+    public function testMoveLeft()
+    {
+        $this->categories('Child 2')->moveLeft();
+
+        $this->assertNull($this->categories('Child 2')->getLeftSibling());
+        $this->assertEquals($this->categories('Child 1'), $this->categories('Child 2')->getRightSibling());
+        $this->assertTrue(Category::isValidNestedSet());
+    }
+
+    /**
+     * @expectedException Baum\MoveNotPossibleException
+     */
+    public function testMoveLeftRaisesAnExceptionWhenNotPossible()
+    {
+        $node = $this->categories('Child 2');
+
+        $node->moveLeft();
+        $node->moveLeft();
+    }
+
+    public function testMoveLeftDoesNotChangeDepth()
+    {
+        $this->categories('Child 2')->moveLeft();
+
+        $this->assertEquals(1, $this->categories('Child 2')->getDepth());
+        $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
+    }
+
+    public function testMoveLeftWithSubtree()
+    {
+        $this->categories('Root 2')->moveLeft();
+
+        $this->assertNull($this->categories('Root 2')->getLeftSibling());
+        $this->assertEquals($this->categories('Root 1'), $this->categories('Root 2')->getRightSibling());
+        $this->assertTrue(Category::isValidNestedSet());
+
+        $this->assertEquals(0, $this->categories('Root 1')->getDepth());
+        $this->assertEquals(0, $this->categories('Root 2')->getDepth());
+
+        $this->assertEquals(1, $this->categories('Child 1')->getDepth());
+        $this->assertEquals(1, $this->categories('Child 2')->getDepth());
+        $this->assertEquals(1, $this->categories('Child 3')->getDepth());
+
+        $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
+    }
+
+    public function testMoveToLeftOf()
+    {
+        $this->categories('Child 3')->moveToLeftOf($this->categories('Child 1'));
+
+        $this->assertNull($this->categories('Child 3')->getLeftSibling());
+        $this->assertEquals($this->categories('Child 1'), $this->categories('Child 3')->getRightSibling());
+        $this->assertTrue(Category::isValidNestedSet());
+    }
+
+    /**
+     * @expectedException Baum\MoveNotPossibleException
+     */
+    public function testMoveToLeftOfRaisesAnExceptionWhenNotPossible()
+    {
+        $this->categories('Child 1')->moveToLeftOf($this->categories('Child 1')->getLeftSibling());
+    }
+
+    public function testMoveToLeftOfDoesNotChangeDepth()
+    {
+        $this->categories('Child 2')->moveToLeftOf($this->categories('Child 1'));
+
+        $this->assertEquals(1, $this->categories('Child 2')->getDepth());
+        $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
+    }
+
+    public function testMoveToLeftOfWithSubtree()
+    {
+        $this->categories('Root 2')->moveToLeftOf($this->categories('Root 1'));
+
+        $this->assertNull($this->categories('Root 2')->getLeftSibling());
+        $this->assertEquals($this->categories('Root 1'), $this->categories('Root 2')->getRightSibling());
+        $this->assertTrue(Category::isValidNestedSet());
+
+        $this->assertEquals(0, $this->categories('Root 1')->getDepth());
+        $this->assertEquals(0, $this->categories('Root 2')->getDepth());
+        $this->assertEquals(1, $this->categories('Child 1')->getDepth());
+        $this->assertEquals(1, $this->categories('Child 2')->getDepth());
+        $this->assertEquals(1, $this->categories('Child 3')->getDepth());
+        $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
+    }
+
+    public function testMoveRight()
+    {
+        $this->categories('Child 2')->moveRight();
+
+        $this->assertNull($this->categories('Child 2')->getRightSibling());
+        $this->assertEquals($this->categories('Child 3'), $this->categories('Child 2')->getLeftSibling());
+        $this->assertTrue(Category::isValidNestedSet());
+    }
+
+    /**
+     * @expectedException Baum\MoveNotPossibleException
+     */
+    public function testMoveRightRaisesAnExceptionWhenNotPossible()
+    {
+        $node = $this->categories('Child 2');
 
-  public function testMoveLeft() {
-    $this->categories('Child 2')->moveLeft();
+        $node->moveRight();
+        $node->moveRight();
+    }
 
-    $this->assertNull($this->categories('Child 2')->getLeftSibling());
+    public function testMoveRightDoesNotChangeDepth()
+    {
+        $this->categories('Child 2')->moveRight();
 
-    $this->assertEquals($this->categories('Child 1'), $this->categories('Child 2')->getRightSibling());
+        $this->assertEquals(1, $this->categories('Child 2')->getDepth());
+        $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
+    }
 
-    $this->assertTrue(Category::isValidNestedSet());
-  }
+    public function testMoveRightWithSubtree()
+    {
+        $this->categories('Root 1')->moveRight();
 
-  /**
-   * @expectedException Baum\MoveNotPossibleException
-   */
-  public function testMoveLeftRaisesAnExceptionWhenNotPossible() {
-    $node = $this->categories('Child 2');
+        $this->assertNull($this->categories('Root 1')->getRightSibling());
+        $this->assertEquals($this->categories('Root 2'), $this->categories('Root 1')->getLeftSibling());
+        $this->assertTrue(Category::isValidNestedSet());
 
-    $node->moveLeft();
-    $node->moveLeft();
-  }
+        $this->assertEquals(0, $this->categories('Root 1')->getDepth());
+        $this->assertEquals(0, $this->categories('Root 2')->getDepth());
 
-  public function testMoveLeftDoesNotChangeDepth() {
-    $this->categories('Child 2')->moveLeft();
+        $this->assertEquals(1, $this->categories('Child 1')->getDepth());
+        $this->assertEquals(1, $this->categories('Child 2')->getDepth());
+        $this->assertEquals(1, $this->categories('Child 3')->getDepth());
 
-    $this->assertEquals(1, $this->categories('Child 2')->getDepth());
-    $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
-  }
+        $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
+    }
 
-  public function testMoveLeftWithSubtree() {
-    $this->categories('Root 2')->moveLeft();
+    public function testMoveToRightOf()
+    {
+        $this->categories('Child 1')->moveToRightOf($this->categories('Child 3'));
 
-    $this->assertNull($this->categories('Root 2')->getLeftSibling());
-    $this->assertEquals($this->categories('Root 1'), $this->categories('Root 2')->getRightSibling());
-    $this->assertTrue(Category::isValidNestedSet());
+        $this->assertNull($this->categories('Child 1')->getRightSibling());
 
-    $this->assertEquals(0, $this->categories('Root 1')->getDepth());
-    $this->assertEquals(0, $this->categories('Root 2')->getDepth());
+        $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->getLeftSibling());
 
-    $this->assertEquals(1, $this->categories('Child 1')->getDepth());
-    $this->assertEquals(1, $this->categories('Child 2')->getDepth());
-    $this->assertEquals(1, $this->categories('Child 3')->getDepth());
+        $this->assertTrue(Category::isValidNestedSet());
+    }
 
-    $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
-  }
+    /**
+     * @expectedException Baum\MoveNotPossibleException
+     */
+    public function testMoveToRightOfRaisesAnExceptionWhenNotPossible()
+    {
+        $this->categories('Child 3')->moveToRightOf($this->categories('Child 3')->getRightSibling());
+    }
 
-  public function testMoveToLeftOf() {
-    $this->categories('Child 3')->moveToLeftOf($this->categories('Child 1'));
+    public function testMoveToRightOfDoesNotChangeDepth()
+    {
+        $this->categories('Child 2')->moveToRightOf($this->categories('Child 3'));
 
-    $this->assertNull($this->categories('Child 3')->getLeftSibling());
+        $this->assertEquals(1, $this->categories('Child 2')->getDepth());
+        $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
+    }
 
-    $this->assertEquals($this->categories('Child 1'), $this->categories('Child 3')->getRightSibling());
+    public function testMoveToRightOfWithSubtree()
+    {
+        $this->categories('Root 1')->moveToRightOf($this->categories('Root 2'));
 
-    $this->assertTrue(Category::isValidNestedSet());
-  }
+        $this->assertNull($this->categories('Root 1')->getRightSibling());
+        $this->assertEquals($this->categories('Root 2'), $this->categories('Root 1')->getLeftSibling());
+        $this->assertTrue(Category::isValidNestedSet());
 
-  /**
-   * @expectedException Baum\MoveNotPossibleException
-   */
-  public function testMoveToLeftOfRaisesAnExceptionWhenNotPossible() {
-    $this->categories('Child 1')->moveToLeftOf($this->categories('Child 1')->getLeftSibling());
-  }
+        $this->assertEquals(0, $this->categories('Root 1')->getDepth());
+        $this->assertEquals(0, $this->categories('Root 2')->getDepth());
 
-  public function testMoveToLeftOfDoesNotChangeDepth() {
-    $this->categories('Child 2')->moveToLeftOf($this->categories('Child 1'));
+        $this->assertEquals(1, $this->categories('Child 1')->getDepth());
+        $this->assertEquals(1, $this->categories('Child 2')->getDepth());
+        $this->assertEquals(1, $this->categories('Child 3')->getDepth());
 
-    $this->assertEquals(1, $this->categories('Child 2')->getDepth());
-    $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
-  }
+        $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
+    }
 
-  public function testMoveToLeftOfWithSubtree() {
-    $this->categories('Root 2')->moveToLeftOf($this->categories('Root 1'));
+    public function testMakeRoot()
+    {
+        $this->categories('Child 2')->makeRoot();
 
-    $this->assertNull($this->categories('Root 2')->getLeftSibling());
-    $this->assertEquals($this->categories('Root 1'), $this->categories('Root 2')->getRightSibling());
-    $this->assertTrue(Category::isValidNestedSet());
+        $newRoot = $this->categories('Child 2');
 
-    $this->assertEquals(0, $this->categories('Root 1')->getDepth());
-    $this->assertEquals(0, $this->categories('Root 2')->getDepth());
+        $this->assertNull($newRoot->parent()->first());
+        $this->assertEquals(0, $newRoot->getLevel());
+        $this->assertEquals(9, $newRoot->getLeft());
+        $this->assertEquals(12, $newRoot->getRight());
 
-    $this->assertEquals(1, $this->categories('Child 1')->getDepth());
-    $this->assertEquals(1, $this->categories('Child 2')->getDepth());
-    $this->assertEquals(1, $this->categories('Child 3')->getDepth());
+        $this->assertEquals(1, $this->categories('Child 2.1')->getLevel());
 
-    $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
-  }
+        $this->assertTrue(Category::isValidNestedSet());
+    }
 
-  public function testMoveRight() {
-    $this->categories('Child 2')->moveRight();
+    public function testNullifyParentColumnMakesItRoot()
+    {
+        $node = $this->categories('Child 2');
 
-    $this->assertNull($this->categories('Child 2')->getRightSibling());
+        $node->parent_id = null;
 
-    $this->assertEquals($this->categories('Child 3'), $this->categories('Child 2')->getLeftSibling());
+        $node->save();
 
-    $this->assertTrue(Category::isValidNestedSet());
-  }
+        $this->assertNull($node->parent()->first());
+        $this->assertEquals(0, $node->getLevel());
+        $this->assertEquals(9, $node->getLeft());
+        $this->assertEquals(12, $node->getRight());
 
-  /**
-   * @expectedException Baum\MoveNotPossibleException
-   */
-  public function testMoveRightRaisesAnExceptionWhenNotPossible() {
-    $node = $this->categories('Child 2');
+        $this->assertEquals(1, $this->categories('Child 2.1')->getLevel());
 
-    $node->moveRight();
-    $node->moveRight();
-  }
+        $this->assertTrue(Category::isValidNestedSet());
+    }
 
-  public function testMoveRightDoesNotChangeDepth() {
-    $this->categories('Child 2')->moveRight();
+    public function testNullifyParentColumnOnNewNodes()
+    {
+        $node = new Category(['name' => 'Root 3']);
 
-    $this->assertEquals(1, $this->categories('Child 2')->getDepth());
-    $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
-  }
+        $node->parent_id = null;
 
-  public function testMoveRightWithSubtree() {
-    $this->categories('Root 1')->moveRight();
+        $node->save();
 
-    $this->assertNull($this->categories('Root 1')->getRightSibling());
-    $this->assertEquals($this->categories('Root 2'), $this->categories('Root 1')->getLeftSibling());
-    $this->assertTrue(Category::isValidNestedSet());
+        $node->reload();
 
-    $this->assertEquals(0, $this->categories('Root 1')->getDepth());
-    $this->assertEquals(0, $this->categories('Root 2')->getDepth());
+        $this->assertNull($node->parent()->first());
+        $this->assertEquals(0, $node->getLevel());
+        $this->assertEquals(13, $node->getLeft());
+        $this->assertEquals(14, $node->getRight());
 
-    $this->assertEquals(1, $this->categories('Child 1')->getDepth());
-    $this->assertEquals(1, $this->categories('Child 2')->getDepth());
-    $this->assertEquals(1, $this->categories('Child 3')->getDepth());
+        $this->assertTrue(Category::isValidNestedSet());
+    }
 
-    $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
-  }
+    public function testNewCategoryWithNullParent()
+    {
+        $node = new Category(['name' => 'Root 3']);
+        $this->assertTrue($node->isRoot());
 
-  public function testMoveToRightOf() {
-    $this->categories('Child 1')->moveToRightOf($this->categories('Child 3'));
+        $node->save();
+        $this->assertTrue($node->isRoot());
 
-    $this->assertNull($this->categories('Child 1')->getRightSibling());
+        $node->makeRoot();
+        $this->assertTrue($node->isRoot());
+    }
 
-    $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->getLeftSibling());
+    public function testMakeChildOf()
+    {
+        $this->categories('Child 1')->makeChildOf($this->categories('Child 3'));
 
-    $this->assertTrue(Category::isValidNestedSet());
-  }
+        $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->parent()->first());
 
-  /**
-   * @expectedException Baum\MoveNotPossibleException
-   */
-  public function testMoveToRightOfRaisesAnExceptionWhenNotPossible() {
-    $this->categories('Child 3')->moveToRightOf($this->categories('Child 3')->getRightSibling());
-  }
+        $this->assertTrue(Category::isValidNestedSet());
+    }
 
-  public function testMoveToRightOfDoesNotChangeDepth() {
-    $this->categories('Child 2')->moveToRightOf($this->categories('Child 3'));
+    public function testMakeChildOfAppendsAtTheEnd()
+    {
+        $newChild = Category::create(['name' => 'Child 4']);
+        $newChild->makeChildOf($this->categories('Root 1'));
+        $lastChild = $this->categories('Root 1')->children()->get()->last();
 
-    $this->assertEquals(1, $this->categories('Child 2')->getDepth());
-    $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
-  }
+        $this->assertEquals($newChild->getAttributes(), $lastChild->getAttributes());
+        $this->assertTrue(Category::isValidNestedSet());
+    }
 
-  public function testMoveToRightOfWithSubtree() {
-    $this->categories('Root 1')->moveToRightOf($this->categories('Root 2'));
+    public function testMakeChildOfMovesWithSubtree()
+    {
+        $this->categories('Child 2')->makeChildOf($this->categories('Child 1'));
 
-    $this->assertNull($this->categories('Root 1')->getRightSibling());
-    $this->assertEquals($this->categories('Root 2'), $this->categories('Root 1')->getLeftSibling());
-    $this->assertTrue(Category::isValidNestedSet());
+        $this->assertTrue(Category::isValidNestedSet());
 
-    $this->assertEquals(0, $this->categories('Root 1')->getDepth());
-    $this->assertEquals(0, $this->categories('Root 2')->getDepth());
+        $this->assertEquals($this->categories('Child 1')->getKey(), $this->categories('Child 2')->getParentId());
 
-    $this->assertEquals(1, $this->categories('Child 1')->getDepth());
-    $this->assertEquals(1, $this->categories('Child 2')->getDepth());
-    $this->assertEquals(1, $this->categories('Child 3')->getDepth());
+        $this->assertEquals(3, $this->categories('Child 2')->getLeft());
+        $this->assertEquals(6, $this->categories('Child 2')->getRight());
 
-    $this->assertEquals(2, $this->categories('Child 2.1')->getDepth());
-  }
+        $this->assertEquals(2, $this->categories('Child 1')->getLeft());
+        $this->assertEquals(7, $this->categories('Child 1')->getRight());
+    }
 
-  public function testMakeRoot() {
-    $this->categories('Child 2')->makeRoot();
+    public function testMakeChildOfSwappingRoots()
+    {
+        $newRoot = Category::create(['name' => 'Root 3']);
 
-    $newRoot = $this->categories('Child 2');
+        $this->assertEquals(13, $newRoot->getLeft());
+        $this->assertEquals(14, $newRoot->getRight());
 
-    $this->assertNull($newRoot->parent()->first());
-    $this->assertEquals(0, $newRoot->getLevel());
-    $this->assertEquals(9, $newRoot->getLeft());
-    $this->assertEquals(12, $newRoot->getRight());
+        $this->categories('Root 2')->makeChildOf($newRoot);
 
-    $this->assertEquals(1, $this->categories('Child 2.1')->getLevel());
+        $this->assertTrue(Category::isValidNestedSet());
 
-    $this->assertTrue(Category::isValidNestedSet());
-  }
+        $this->assertEquals($newRoot->getKey(), $this->categories('Root 2')->getParentId());
 
-  public function testNullifyParentColumnMakesItRoot() {
-    $node = $this->categories('Child 2');
+        $this->assertEquals(12, $this->categories('Root 2')->getLeft());
+        $this->assertEquals(13, $this->categories('Root 2')->getRight());
 
-    $node->parent_id = null;
+        $this->assertEquals(11, $newRoot->getLeft());
+        $this->assertEquals(14, $newRoot->getRight());
+    }
 
-    $node->save();
+    public function testMakeChildOfSwappingRootsWithSubtrees()
+    {
+        $newRoot = Category::create(['name' => 'Root 3']);
 
-    $this->assertNull($node->parent()->first());
-    $this->assertEquals(0, $node->getLevel());
-    $this->assertEquals(9, $node->getLeft());
-    $this->assertEquals(12, $node->getRight());
+        $this->categories('Root 1')->makeChildOf($newRoot);
 
-    $this->assertEquals(1, $this->categories('Child 2.1')->getLevel());
+        $this->assertTrue(Category::isValidNestedSet());
 
-    $this->assertTrue(Category::isValidNestedSet());
-  }
+        $this->assertEquals($newRoot->getKey(), $this->categories('Root 1')->getParentId());
 
-  public function testNullifyParentColumnOnNewNodes() {
-    $node = new Category(['name' => 'Root 3']);
+        $this->assertEquals(4, $this->categories('Root 1')->getLeft());
+        $this->assertEquals(13, $this->categories('Root 1')->getRight());
 
-    $node->parent_id = null;
+        $this->assertEquals(8, $this->categories('Child 2.1')->getLeft());
+        $this->assertEquals(9, $this->categories('Child 2.1')->getRight());
+    }
 
-    $node->save();
+    public function testMakeFirstChildOf()
+    {
+        $this->categories('Child 1')->makeFirstChildOf($this->categories('Child 3'));
 
-    $node->reload();
+        $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->parent()->first());
 
-    $this->assertNull($node->parent()->first());
-    $this->assertEquals(0, $node->getLevel());
-    $this->assertEquals(13, $node->getLeft());
-    $this->assertEquals(14, $node->getRight());
+        $this->assertTrue(Category::isValidNestedSet());
+    }
 
-    $this->assertTrue(Category::isValidNestedSet());
-  }
+    public function testMakeFirstChildOfAppendsAtTheBeginning()
+    {
+        $newChild = Category::create(['name' => 'Child 4']);
 
-  public function testNewCategoryWithNullParent() {
-    $node = new Category(['name' => 'Root 3']);
-    $this->assertTrue($node->isRoot());
+        $newChild->makeFirstChildOf($this->categories('Root 1'));
 
-    $node->save();
-    $this->assertTrue($node->isRoot());
+        $lastChild = $this->categories('Root 1')->children()->get()->first();
+        $this->assertEquals($newChild->getAttributes(), $lastChild->getAttributes());
 
-    $node->makeRoot();
-    $this->assertTrue($node->isRoot());
-  }
+        $this->assertTrue(Category::isValidNestedSet());
+    }
 
-  public function testMakeChildOf() {
-    $this->categories('Child 1')->makeChildOf($this->categories('Child 3'));
+    public function testMakeFirstChildOfMovesWithSubtree()
+    {
+        $this->categories('Child 2')->makeFirstChildOf($this->categories('Child 1'));
 
-    $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->parent()->first());
+        $this->assertTrue(Category::isValidNestedSet());
 
-    $this->assertTrue(Category::isValidNestedSet());
-  }
+        $this->assertEquals($this->categories('Child 1')->getKey(), $this->categories('Child 2')->getParentId());
 
-  public function testMakeChildOfAppendsAtTheEnd() {
-    $newChild = Category::create(array('name' => 'Child 4'));
+        $this->assertEquals(3, $this->categories('Child 2')->getLeft());
+        $this->assertEquals(6, $this->categories('Child 2')->getRight());
 
-    $newChild->makeChildOf($this->categories('Root 1'));
+        $this->assertEquals(2, $this->categories('Child 1')->getLeft());
+        $this->assertEquals(7, $this->categories('Child 1')->getRight());
+    }
 
-    $lastChild = $this->categories('Root 1')->children()->get()->last();
-    $this->assertEquals($newChild, $lastChild);
+    public function testMakeFirstChildOfSwappingRoots()
+    {
+        $newRoot = Category::create(['name' => 'Root 3']);
 
-    $this->assertTrue(Category::isValidNestedSet());
-  }
+        $this->assertEquals(13, $newRoot->getLeft());
+        $this->assertEquals(14, $newRoot->getRight());
 
-  public function testMakeChildOfMovesWithSubtree() {
-    $this->categories('Child 2')->makeChildOf($this->categories('Child 1'));
+        $this->categories('Root 2')->makeFirstChildOf($newRoot);
 
-    $this->assertTrue(Category::isValidNestedSet());
+        $this->assertTrue(Category::isValidNestedSet());
 
-    $this->assertEquals($this->categories('Child 1')->getKey(), $this->categories('Child 2')->getParentId());
+        $this->assertEquals($newRoot->getKey(), $this->categories('Root 2')->getParentId());
 
-    $this->assertEquals(3, $this->categories('Child 2')->getLeft());
-    $this->assertEquals(6, $this->categories('Child 2')->getRight());
+        $this->assertEquals(12, $this->categories('Root 2')->getLeft());
+        $this->assertEquals(13, $this->categories('Root 2')->getRight());
 
-    $this->assertEquals(2, $this->categories('Child 1')->getLeft());
-    $this->assertEquals(7, $this->categories('Child 1')->getRight());
-  }
+        $this->assertEquals(11, $newRoot->getLeft());
+        $this->assertEquals(14, $newRoot->getRight());
+    }
 
-  public function testMakeChildOfSwappingRoots() {
-    $newRoot = Category::create(array('name' => 'Root 3'));
+    public function testMakeFirstChildOfSwappingRootsWithSubtrees()
+    {
+        $newRoot = Category::create(['name' => 'Root 3']);
 
-    $this->assertEquals(13, $newRoot->getLeft());
-    $this->assertEquals(14, $newRoot->getRight());
+        $this->categories('Root 1')->makeFirstChildOf($newRoot);
 
-    $this->categories('Root 2')->makeChildOf($newRoot);
+        $this->assertTrue(Category::isValidNestedSet());
 
-    $this->assertTrue(Category::isValidNestedSet());
+        $this->assertEquals($newRoot->getKey(), $this->categories('Root 1')->getParentId());
 
-    $this->assertEquals($newRoot->getKey(), $this->categories('Root 2')->getParentId());
+        $this->assertEquals(4, $this->categories('Root 1')->getLeft());
+        $this->assertEquals(13, $this->categories('Root 1')->getRight());
 
-    $this->assertEquals(12, $this->categories('Root 2')->getLeft());
-    $this->assertEquals(13, $this->categories('Root 2')->getRight());
+        $this->assertEquals(8, $this->categories('Child 2.1')->getLeft());
+        $this->assertEquals(9, $this->categories('Child 2.1')->getRight());
+    }
 
-    $this->assertEquals(11, $newRoot->getLeft());
-    $this->assertEquals(14, $newRoot->getRight());
-  }
+    public function testMakeLastChildOf()
+    {
+        $this->categories('Child 1')->makeLastChildOf($this->categories('Child 3'));
 
-  public function testMakeChildOfSwappingRootsWithSubtrees() {
-    $newRoot = Category::create(array('name' => 'Root 3'));
+        $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->parent()->first());
 
-    $this->categories('Root 1')->makeChildOf($newRoot);
+        $this->assertTrue(Category::isValidNestedSet());
+    }
 
-    $this->assertTrue(Category::isValidNestedSet());
+    public function testMakeLastChildOfAppendsAtTheEnd()
+    {
+        $newChild = Category::create(['name' => 'Child 4']);
 
-    $this->assertEquals($newRoot->getKey(), $this->categories('Root 1')->getParentId());
+        $newChild->makeLastChildOf($this->categories('Root 1'));
 
-    $this->assertEquals(4, $this->categories('Root 1')->getLeft());
-    $this->assertEquals(13, $this->categories('Root 1')->getRight());
+        $lastChild = $this->categories('Root 1')->children()->get()->last();
+        $this->assertEquals($newChild->getAttributes(), $lastChild->getAttributes());
 
-    $this->assertEquals(8, $this->categories('Child 2.1')->getLeft());
-    $this->assertEquals(9, $this->categories('Child 2.1')->getRight());
-  }
+        $this->assertTrue(Category::isValidNestedSet());
+    }
 
-  public function testMakeFirstChildOf() {
-    $this->categories('Child 1')->makeFirstChildOf($this->categories('Child 3'));
+    public function testMakeLastChildOfMovesWithSubtree()
+    {
+        $this->categories('Child 2')->makeLastChildOf($this->categories('Child 1'));
 
-    $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->parent()->first());
+        $this->assertTrue(Category::isValidNestedSet());
 
-    $this->assertTrue(Category::isValidNestedSet());
-  }
+        $this->assertEquals($this->categories('Child 1')->getKey(), $this->categories('Child 2')->getParentId());
 
-  public function testMakeFirstChildOfAppendsAtTheBeginning() {
-    $newChild = Category::create(array('name' => 'Child 4'));
+        $this->assertEquals(3, $this->categories('Child 2')->getLeft());
+        $this->assertEquals(6, $this->categories('Child 2')->getRight());
 
-    $newChild->makeFirstChildOf($this->categories('Root 1'));
+        $this->assertEquals(2, $this->categories('Child 1')->getLeft());
+        $this->assertEquals(7, $this->categories('Child 1')->getRight());
+    }
 
-    $lastChild = $this->categories('Root 1')->children()->get()->first();
-    $this->assertEquals($newChild, $lastChild);
+    public function testMakeLastChildOfSwappingRoots()
+    {
+        $newRoot = Category::create(['name' => 'Root 3']);
 
-    $this->assertTrue(Category::isValidNestedSet());
-  }
+        $this->assertEquals(13, $newRoot->getLeft());
+        $this->assertEquals(14, $newRoot->getRight());
 
-  public function testMakeFirstChildOfMovesWithSubtree() {
-    $this->categories('Child 2')->makeFirstChildOf($this->categories('Child 1'));
+        $this->categories('Root 2')->makeLastChildOf($newRoot);
 
-    $this->assertTrue(Category::isValidNestedSet());
+        $this->assertTrue(Category::isValidNestedSet());
 
-    $this->assertEquals($this->categories('Child 1')->getKey(), $this->categories('Child 2')->getParentId());
+        $this->assertEquals($newRoot->getKey(), $this->categories('Root 2')->getParentId());
 
-    $this->assertEquals(3, $this->categories('Child 2')->getLeft());
-    $this->assertEquals(6, $this->categories('Child 2')->getRight());
+        $this->assertEquals(12, $this->categories('Root 2')->getLeft());
+        $this->assertEquals(13, $this->categories('Root 2')->getRight());
 
-    $this->assertEquals(2, $this->categories('Child 1')->getLeft());
-    $this->assertEquals(7, $this->categories('Child 1')->getRight());
-  }
+        $this->assertEquals(11, $newRoot->getLeft());
+        $this->assertEquals(14, $newRoot->getRight());
+    }
 
-  public function testMakeFirstChildOfSwappingRoots() {
-    $newRoot = Category::create(array('name' => 'Root 3'));
+    public function testMakeLastChildOfSwappingRootsWithSubtrees()
+    {
+        $newRoot = Category::create(['name' => 'Root 3']);
 
-    $this->assertEquals(13, $newRoot->getLeft());
-    $this->assertEquals(14, $newRoot->getRight());
+        $this->categories('Root 1')->makeLastChildOf($newRoot);
 
-    $this->categories('Root 2')->makeFirstChildOf($newRoot);
+        $this->assertTrue(Category::isValidNestedSet());
 
-    $this->assertTrue(Category::isValidNestedSet());
+        $this->assertEquals($newRoot->getKey(), $this->categories('Root 1')->getParentId());
 
-    $this->assertEquals($newRoot->getKey(), $this->categories('Root 2')->getParentId());
+        $this->assertEquals(4, $this->categories('Root 1')->getLeft());
+        $this->assertEquals(13, $this->categories('Root 1')->getRight());
 
-    $this->assertEquals(12, $this->categories('Root 2')->getLeft());
-    $this->assertEquals(13, $this->categories('Root 2')->getRight());
+        $this->assertEquals(8, $this->categories('Child 2.1')->getLeft());
+        $this->assertEquals(9, $this->categories('Child 2.1')->getRight());
+    }
 
-    $this->assertEquals(11, $newRoot->getLeft());
-    $this->assertEquals(14, $newRoot->getRight());
-  }
+    /**
+     * @expectedException Baum\MoveNotPossibleException
+     */
+    public function testUnpersistedNodeCannotBeMoved()
+    {
+        $unpersisted = new Category(['name' => 'Unpersisted']);
 
-  public function testMakeFirstChildOfSwappingRootsWithSubtrees() {
-    $newRoot = Category::create(array('name' => 'Root 3'));
+        $unpersisted->moveToRightOf($this->categories('Root 1'));
+    }
 
-    $this->categories('Root 1')->makeFirstChildOf($newRoot);
+    /**
+     * @expectedException Baum\MoveNotPossibleException
+     */
+    public function testUnpersistedNodeCannotBeMadeChild()
+    {
+        $unpersisted = new Category(['name' => 'Unpersisted']);
 
-    $this->assertTrue(Category::isValidNestedSet());
+        $unpersisted->makeChildOf($this->categories('Root 1'));
+    }
 
-    $this->assertEquals($newRoot->getKey(), $this->categories('Root 1')->getParentId());
+    /**
+     * @expectedException Baum\MoveNotPossibleException
+     */
+    public function testNodesCannotBeMovedToItself()
+    {
+        $node = $this->categories('Child 1');
 
-    $this->assertEquals(4, $this->categories('Root 1')->getLeft());
-    $this->assertEquals(13, $this->categories('Root 1')->getRight());
+        $node->moveToRightOf($node);
+    }
 
-    $this->assertEquals(8, $this->categories('Child 2.1')->getLeft());
-    $this->assertEquals(9, $this->categories('Child 2.1')->getRight());
-  }
+    /**
+     * @expectedException Baum\MoveNotPossibleException
+     */
+    public function testNodesCannotBeMadeChildOfThemselves()
+    {
+        $node = $this->categories('Child 1');
 
-  public function testMakeLastChildOf() {
-    $this->categories('Child 1')->makeLastChildOf($this->categories('Child 3'));
+        $node->makeChildOf($node);
+    }
 
-    $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->parent()->first());
+    /**
+     * @expectedException Baum\MoveNotPossibleException
+     */
+    public function testNodesCannotBeMovedToDescendantsOfThemselves()
+    {
+        $node = $this->categories('Root 1');
 
-    $this->assertTrue(Category::isValidNestedSet());
-  }
+        $node->makeChildOf($this->categories('Child 2.1'));
+    }
 
-  public function testMakeLastChildOfAppendsAtTheEnd() {
-    $newChild = Category::create(array('name' => 'Child 4'));
+    public function testDepthIsUpdatedWhenMadeChild()
+    {
+        $a = Category::create(['name' => 'A']);
+        $b = Category::create(['name' => 'B']);
+        $c = Category::create(['name' => 'C']);
+        $d = Category::create(['name' => 'D']);
 
-    $newChild->makeLastChildOf($this->categories('Root 1'));
+        // a > b > c > d
+        $b->makeChildOf($a);
+        $c->makeChildOf($b);
+        $d->makeChildOf($c);
 
-    $lastChild = $this->categories('Root 1')->children()->get()->last();
-    $this->assertEquals($newChild, $lastChild);
+        $a->reload();
+        $b->reload();
+        $c->reload();
+        $d->reload();
 
-    $this->assertTrue(Category::isValidNestedSet());
-  }
+        $this->assertEquals(0, $a->getDepth());
+        $this->assertEquals(1, $b->getDepth());
+        $this->assertEquals(2, $c->getDepth());
+        $this->assertEquals(3, $d->getDepth());
+    }
 
-  public function testMakeLastChildOfMovesWithSubtree() {
-    $this->categories('Child 2')->makeLastChildOf($this->categories('Child 1'));
+    public function testDepthIsUpdatedOnDescendantsWhenParentMoves()
+    {
+        $a = Category::create(['name' => 'A']);
+        $b = Category::create(['name' => 'B']);
+        $c = Category::create(['name' => 'C']);
+        $d = Category::create(['name' => 'D']);
 
-    $this->assertTrue(Category::isValidNestedSet());
+        // a > b > c > d
+        $b->makeChildOf($a);
+        $c->makeChildOf($b);
+        $d->makeChildOf($c);
 
-    $this->assertEquals($this->categories('Child 1')->getKey(), $this->categories('Child 2')->getParentId());
+        $a->reload();
+        $b->reload();
+        $c->reload();
+        $d->reload();
 
-    $this->assertEquals(3, $this->categories('Child 2')->getLeft());
-    $this->assertEquals(6, $this->categories('Child 2')->getRight());
+        $b->moveToRightOf($a);
 
-    $this->assertEquals(2, $this->categories('Child 1')->getLeft());
-    $this->assertEquals(7, $this->categories('Child 1')->getRight());
-  }
+        $a->reload();
+        $b->reload();
+        $c->reload();
+        $d->reload();
 
-  public function testMakeLastChildOfSwappingRoots() {
-    $newRoot = Category::create(array('name' => 'Root 3'));
-
-    $this->assertEquals(13, $newRoot->getLeft());
-    $this->assertEquals(14, $newRoot->getRight());
-
-    $this->categories('Root 2')->makeLastChildOf($newRoot);
-
-    $this->assertTrue(Category::isValidNestedSet());
-
-    $this->assertEquals($newRoot->getKey(), $this->categories('Root 2')->getParentId());
-
-    $this->assertEquals(12, $this->categories('Root 2')->getLeft());
-    $this->assertEquals(13, $this->categories('Root 2')->getRight());
-
-    $this->assertEquals(11, $newRoot->getLeft());
-    $this->assertEquals(14, $newRoot->getRight());
-  }
-
-  public function testMakeLastChildOfSwappingRootsWithSubtrees() {
-    $newRoot = Category::create(array('name' => 'Root 3'));
-
-    $this->categories('Root 1')->makeLastChildOf($newRoot);
-
-    $this->assertTrue(Category::isValidNestedSet());
-
-    $this->assertEquals($newRoot->getKey(), $this->categories('Root 1')->getParentId());
-
-    $this->assertEquals(4, $this->categories('Root 1')->getLeft());
-    $this->assertEquals(13, $this->categories('Root 1')->getRight());
-
-    $this->assertEquals(8, $this->categories('Child 2.1')->getLeft());
-    $this->assertEquals(9, $this->categories('Child 2.1')->getRight());
-  }
-
-  /**
-   * @expectedException Baum\MoveNotPossibleException
-   */
-  public function testUnpersistedNodeCannotBeMoved() {
-    $unpersisted = new Category(array('name' => 'Unpersisted'));
-
-    $unpersisted->moveToRightOf($this->categories('Root 1'));
-  }
-
-  /**
-   * @expectedException Baum\MoveNotPossibleException
-   */
-  public function testUnpersistedNodeCannotBeMadeChild() {
-    $unpersisted = new Category(array('name' => 'Unpersisted'));
-
-    $unpersisted->makeChildOf($this->categories('Root 1'));
-  }
-
-  /**
-   * @expectedException Baum\MoveNotPossibleException
-   */
-  public function testNodesCannotBeMovedToItself() {
-    $node = $this->categories('Child 1');
-
-    $node->moveToRightOf($node);
-  }
-
-  /**
-   * @expectedException Baum\MoveNotPossibleException
-   */
-  public function testNodesCannotBeMadeChildOfThemselves() {
-    $node = $this->categories('Child 1');
-
-    $node->makeChildOf($node);
-  }
-
-  /**
-   * @expectedException Baum\MoveNotPossibleException
-   */
-  public function testNodesCannotBeMovedToDescendantsOfThemselves() {
-    $node = $this->categories('Root 1');
-
-    $node->makeChildOf($this->categories('Child 2.1'));
-  }
-
-  public function testDepthIsUpdatedWhenMadeChild() {
-    $a = Category::create(array('name' => 'A'));
-    $b = Category::create(array('name' => 'B'));
-    $c = Category::create(array('name' => 'C'));
-    $d = Category::create(array('name' => 'D'));
-
-    // a > b > c > d
-    $b->makeChildOf($a);
-    $c->makeChildOf($b);
-    $d->makeChildOf($c);
-
-    $a->reload();
-    $b->reload();
-    $c->reload();
-    $d->reload();
-
-    $this->assertEquals(0, $a->getDepth());
-    $this->assertEquals(1, $b->getDepth());
-    $this->assertEquals(2, $c->getDepth());
-    $this->assertEquals(3, $d->getDepth());
-  }
-
-  public function testDepthIsUpdatedOnDescendantsWhenParentMoves() {
-    $a = Category::create(array('name' => 'A'));
-    $b = Category::create(array('name' => 'B'));
-    $c = Category::create(array('name' => 'C'));
-    $d = Category::create(array('name' => 'D'));
-
-    // a > b > c > d
-    $b->makeChildOf($a);
-    $c->makeChildOf($b);
-    $d->makeChildOf($c);
-
-    $a->reload(); $b->reload(); $c->reload(); $d->reload();
-
-    $b->moveToRightOf($a);
-
-    $a->reload(); $b->reload(); $c->reload(); $d->reload();
-
-    $this->assertEquals(0, $b->getDepth());
-    $this->assertEquals(1, $c->getDepth());
-    $this->assertEquals(2, $d->getDepth());
-  }
-
+        $this->assertEquals(0, $b->getDepth());
+        $this->assertEquals(1, $c->getDepth());
+        $this->assertEquals(2, $d->getDepth());
+    }
 }
